@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unicode Zeichen-Checker</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    background: #111;
+    color: #eee;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  textarea {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background: #1c1c1e;
+    color: #fff;
+    font: 17px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    outline: none;
+  }
+  textarea:focus { border-color: #888; }
+  .hint { color: #999; font-size: 13px; margin: 8px 0 14px; }
+  #result { overflow-x: auto; }
+  .char {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: top;
+    min-width: 52px;
+    margin: 0 2px 8px;
+    padding: 7px 5px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #181818;
+  }
+  .glyph {
+    height: 30px;
+    min-width: 40px;
+    font-size: 22px;
+    line-height: 30px;
+    text-align: center;
+    white-space: pre;
+  }
+  .space .glyph::after { content: "·"; color: #777; }
+  .code {
+    font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #bbb;
+    margin-top: 4px;
+  }
+  .name {
+    font-size: 10px;
+    color: #777;
+    margin-top: 3px;
+    max-width: 100px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<h1>Unicode Zeichen-Checker</h1>
+<textarea id="input" placeholder="Text hier einfügen …" autofocus></textarea>
+<div class="hint">Jedes Zeichen wird einzeln mit Unicode-Codepoint angezeigt. Leerzeichen erscheinen als ·</div>
+<div id="result"></div>
+
+<script>
+const input = document.getElementById("input");
+const result = document.getElementById("result");
+
+const names = {
+  "0020": "SPACE",
+  "002D": "HYPHEN-MINUS",
+  "005F": "LOW LINE",
+  "00A0": "NO-BREAK SPACE",
+  "2010": "HYPHEN",
+  "2011": "NON-BREAKING HYPHEN",
+  "2012": "FIGURE DASH",
+  "2013": "EN DASH",
+  "2014": "EM DASH",
+  "2015": "HORIZONTAL BAR",
+  "2212": "MINUS SIGN",
+  "2026": "HORIZONTAL ELLIPSIS",
+  "2018": "LEFT SINGLE QUOTATION MARK",
+  "2019": "RIGHT SINGLE QUOTATION MARK",
+  "201C": "LEFT DOUBLE QUOTATION MARK",
+  "201D": "RIGHT DOUBLE QUOTATION MARK"
+};
+
+function update() {
+  result.replaceChildren();
+
+  for (const ch of input.value) {
+    const cp = ch.codePointAt(0);
+    const hex = cp.toString(16).toUpperCase().padStart(4, "0");
+
+    const box = document.createElement("span");
+    box.className = "char" + (/\s/.test(ch) ? " space" : "");
+
+    const glyph = document.createElement("span");
+    glyph.className = "glyph";
+    glyph.textContent = ch;
+
+    const code = document.createElement("span");
+    code.className = "code";
+    code.textContent = "U+" + hex;
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = names[hex] || "";
+
+    box.append(glyph, code, name);
+    result.appendChild(box);
+  }
+}
+
+input.addEventListener("input", update);
+</script>
+</body>
+</html>
